@@ -1,0 +1,6 @@
+[submodule "synsin"]
+	path = synsin
+	url = https://github.com/facebookresearch/synsin
+[submodule "RAFT"]
+	path = RAFT
+	url = https://github.com/princeton-vl/RAFT.git
