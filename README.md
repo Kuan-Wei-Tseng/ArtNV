@@ -5,6 +5,13 @@ The code will be available in **mid June**, 2022.
 
 ## Installation
 
+```
+conda create -n artnv python=3.8
+conda activate artnv
+pip install opencv-python
+
+```
+
 
 
 ### Reference
