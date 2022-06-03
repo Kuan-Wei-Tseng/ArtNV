@@ -2,6 +2,10 @@
 This is the official implementation of "Artistic Style Novel View Synthesis Based on A Single Image" (CVPR 2022 Workshop). The code will be available in **mid June**, 2022.
 
 ## Installation
+Our codes are tested on the following environemnt:
+* Python=3.8
+* PyTorch=1.8.0
+* PyTorch3D = 0.6.2
 
 1. Create a new virtual environment with conda.
 ```
@@ -24,6 +28,9 @@ conda install -c fvcore -c iopath -c conda-forge fvcore iopath
 conda install -c bottler nvidiacub
 conda install pytorch3d -c pytorch3d
 ```
+
+4. Clone the project.
+git clone --recurse-submodules
 
 ### Reference
 If you find this code helpful, please cite
