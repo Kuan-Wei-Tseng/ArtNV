@@ -2,7 +2,7 @@ import os
 import sys
 import argparse
 os.environ['DEBUG'] = '0'
-sys.path.append('./thirdparties/synsin')
+sys.path.append('./synsin')
 
 import cv2
 import quaternion
@@ -22,7 +22,7 @@ torch.backends.cudnn.enabled = True
 parser = argparse.ArgumentParser(description='PyTorch Artistic View Synthesis')
 
 # Training parameters
-parser.add_argument('--MODEL_PATH', type=str, default='./thirdparties/synsin/modelcheckpoints/realestate/zbufferpts.pth', 
+parser.add_argument('--MODEL_PATH', type=str, default='synsin/modelcheckpoints/realestate/zbufferpts.pth', 
                      help='View synthesis pretrained model path')
 parser.add_argument('--SeqName', type=str, default='Temple', 
                      help='Tanks and Temple data sequence')
@@ -125,30 +125,7 @@ for ImageNo, im_path in enumerate(ims):
 
     RT = torch.eye(4).unsqueeze(0)
 
-
     os.system(f"ffmpeg -hide_banner -y -f image2 -framerate 10 -i {os.path.splitext(im_path)[0]}-%2ds.png -s 512x512 \
     -vcodec libx264 -crf 25 -pix_fmt yuv420p ./images/tank_and_temple/{FLAGS.SeqName}/video/{ImageNo:05}.mp4")
 
-    
-        # cv2.imshow("windows", cv2.resize(im1,(1200,1200)))
-        # cv2.waitKey(0)
-        # cv2.imshow("windows", cv2.resize(im2,(1200,1200)))
-        # cv2.waitKey(0)    
-
-        # resize = transforms.Resize([512,512])
-        # depth = resize(depth.squeeze(0))
-
-        # torch.save(depth, "images/depth.depth")
-
-        # dimg = depth.permute(1,2,0).cpu().numpy()
-        # dimg = dimg*255/dimg.max()
-        # dimg = cv2.applyColorMap(dimg.astype(np.uint8), cv2.COLORMAP_JET)
-
-        # cv2.imshow("window",cv2.resize(dimg,(1200,1200)))
-        # cv2.waitKey(0)
-
-        # cv2.imwrite("images/depth.png", cv2.resize(dimg,(512,512)))
-        
-
-        #torch.save(depth,f"../images/{method}/depth/{seqname}/depth.depth")
 

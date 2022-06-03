@@ -2,7 +2,7 @@
 This is the official implementation of "Artistic Style Novel View Synthesis Based on A Single Image" (CVPR 2022 Workshop). The code will be available in **mid June**, 2022.
 
 ## Installation
-Our codes are tested on the following environemnt:
+Our codes are tested on the following environment:
 * Python=3.8
 * PyTorch=1.8.0
 * PyTorch3D = 0.6.2
@@ -29,8 +29,13 @@ conda install -c bottler nvidiacub
 conda install pytorch3d -c pytorch3d
 ```
 
-4. Clone the project.
+4. Clone and setup the project.
+Clone the project with all third-party submodules. Run `setup.sh` to download models for view synthesis and style transfer.
+```
 git clone --recurse-submodules
+cd ArtNV
+sh setup.sh
+```
 
 ### Reference
 If you find this code helpful, please cite
