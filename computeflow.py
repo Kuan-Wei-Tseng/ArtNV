@@ -1,24 +1,25 @@
-import sys
-sys.path.append('RAFT/core')
-
-import argparse
 import os
 import cv2
 import glob
+import argparse
 import numpy as np
+
 import torch
 import torch.nn.functional as F
+
+from tqdm import tqdm 
 from PIL import Image
-from path import Path
+from pathlib import Path
+
+import sys
+sys.path.append('RAFT/core')
 
 from raft import RAFT
 from utils import flow_viz
 from utils import frame_utils
 from utils.utils import InputPadder
-from tqdm import tqdm 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
 def load_image(imfile):
     img = np.array(Image.open(imfile).resize((512,512))).astype(np.uint8)
@@ -68,52 +69,52 @@ def get_grid(tensor, homogeneous=False):
         grid = torch.cat((grid, ones), 1)
     return grid
 
-
 def demo(args):
     model = torch.nn.DataParallel(RAFT(args))
     model.load_state_dict(torch.load(args.model))
 
     model = model.module
-    model.to(DEVICE)
+    model.to(device)
     model.eval()
 
     with torch.no_grad():
 
-        print(f"Anchor Images: {args.ContentDir}")
-        anchor_path  = sorted(glob.glob(Path(args.ContentDir)/"*r.png"))
+        anchor_path  = sorted(Path(args.ContentDir).glob("*r.png"))
         n = len(anchor_path)
 
-        for i in tqdm(range(n)):
+        for index in range(n):
 
-            source_img = load_image(anchor_path[i])
+            prefix = anchor_path[index].stem.split('-')[0]
+            source_img = load_image(anchor_path[index])
             
-            for j in range(12):
+            for j in tqdm(range(args.Views)):
 
-                target_img = load_image(Path(args.ContentDir)/f"{i+1:05}-{j:02}s.png")
-
+                target_img = load_image(Path(args.ContentDir)/f"{prefix}-{j:02}s.png")
                 _, flows_t = model(target_img, source_img, iters=20, test_mode=True)
                 _, flowt_s = model(source_img, target_img, iters=20, test_mode=True)
 
-                torch.save(flows_t, Path(args.FlowDir)/"512"/f"flows_t{i+1:05}-{j:02}.pt")
-                torch.save(flowt_s, Path(args.FlowDir)/"512"/f"flowt_s{i+1:05}-{j:02}.pt")
+                torch.save(flows_t, Path(args.FlowDir)/f"flows_t{prefix}-{j:02}.pt")
+                torch.save(flowt_s, Path(args.FlowDir)/f"flowt_s{prefix}-{j:02}.pt")
 
                 # Compute occulsion masks:
                 masks_t = get_consistency_map(flows_t, flowt_s)
                 maskt_s = get_consistency_map(flowt_s, flows_t)
 
-                torch.save(masks_t, Path(args.MaskDir)/"512"/f"masks_t{i+1:05}-{j:02}.pt")
-                torch.save(maskt_s, Path(args.MaskDir)/"512"/f"maskt_s{i+1:05}-{j:02}.pt")     
+                torch.save(masks_t, Path(args.MaskDir)/f"masks_t{prefix}-{j:02}.pt")
+                torch.save(maskt_s, Path(args.MaskDir)/f"maskt_s{prefix}-{j:02}.pt")     
 
                     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', default="RAFT/models/raft-things.pth", help="restore checkpoint")
     parser.add_argument('--path', help="dataset for evaluation")
+    parser.add_argument('--small', action='store_true', help='use small model')
     parser.add_argument('--mixed_precision', action='store_true', help='use mixed precision')
     parser.add_argument('--alternate_corr', action='store_true', help='use efficent correlation implementation')
-    parser.add_argument('--ContentDir', type=str, default="./images/tank_and_temple/Temple/content", help='Path to the content images')
-    parser.add_argument('--FlowDir', type=str, default="./images/tank_and_temple/Temple/flows", help='Path to save the optical flows')
-    parser.add_argument('--MaskDir', type=str, default="./images/tank_and_temple/Temple/masks", help='Path to save the optical flows')
+    parser.add_argument('--Views', type=int, default=12, help='Number of Novel Views')
+    parser.add_argument('--ContentDir', type=str, default="../images/content", help='Path to the content images')
+    parser.add_argument('--FlowDir', type=str, default="../images/flow", help='Path to save the optical flows')
+    parser.add_argument('--MaskDir', type=str, default="../images/mask", help='Path to save the optical flows')
     args = parser.parse_args()
 
     demo(args)
