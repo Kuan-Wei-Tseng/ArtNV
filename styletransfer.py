@@ -39,11 +39,7 @@ parser.add_argument('--flow', action="store_true")
 parser.add_argument('--FlowDir', type=str, default="../images/flow/", 
                      help='Path to the optical flow')
 parser.add_argument('--MaskDir', type=str, default="../images/mask/", 
-                     help='Path to the optical flow')
-# parser.add_argument('--FlowDirect', type=int, default=1,
-#                      help='0: Use bi-directional optical flow for warping\n\
-#                            1: Use source to target optical flow\n\
-#                           -1: Use target to source optical flow\n')           
+                     help='Path to the optical flow')          
 parser.add_argument('--OutDir', type=str, default="../images/result/", 
                      help='Path to the save the results')
 
@@ -148,70 +144,13 @@ if __name__ == '__main__':
 
                 optimizer.step(closure)
             
+        # Write Images
+        output = input_img.data.clamp_(0, 1)
+        B, C, H, W = output.shape
+        for i in range(1,B):
+            image_writer(output[i,:,:,:], Path(FLAGS.OutDir)/f"{prefix}-{i:02}s-st.png")
 
-
-
-        # # Start Optimization:
-        # print('Optimizing...')
-        # run = [0]
-        # while run[0] <= FLAGS.num_steps:
-        #     def closure():
-        #         # Correct the values of updated input image
-        #         input_img.data.clamp_(0, 1)
-        #         optimizer.zero_grad()
-        #         model(input_img)
-
-        #         style_score = 0
-        #         content_score = 0
-        #         flow_score = 0
-        #         depth_score = 0
-        #         disparity_score = 0 
-
-        #         for sl in style_losses:
-        #             style_score += sl.loss
-        #         for cl in content_losses:
-        #             content_score += cl.loss
-
-        #         style_score *= FLAGS.style_weight
-        #         content_score *= FLAGS.content_weight
-
-        #         loss = style_score + content_score 
-
-        #         if FLAGS.depth:
-        #             depth_score += FLAGS.depth_weight * depthloss(input_img[0], input_img[1:])
-        #             loss += depth_score
-        #         else:
-        #             depth_score = torch.tensor([0])
-
-        #         if FLAGS.flow:
-        #             flow_score += FLAGS.flow_weight * flowloss(input_img[0], input_img[1:])
-        #             loss += flow_score            
-        #         else:
-        #             flow_score = torch.tensor([0])
-
-
-        #         loss.backward()
-
-        #         run[0] += 1
-
-        #         if run[0] % 10 == 0:
-        #             print(f"Run {run}")
-        #             print(f"Style Loss :  {style_score.item():4f}\
-        #                     Content Loss: {content_score.item():4f}\
-        #                     Depth Loss: {depth_score.item():4f}\
-        #                     Flow Loss:{flow_score.item()}")
-
-        #         return loss
-
-        #     optimizer.step(closure)
-
-        # output = input_img.data.clamp_(0, 1)
-        # B, C, H, W = output.shape
-
-        # for i in range(1,B):
-        #     image_writer(output[i,:,:,:], Path(FLAGS.OutDir)/f"{FLAGS.Method}"/f"{index+1:05}-{i:02}s-{styleID}.png")
-
-        # os.system(f"ffmpeg -y -f image2 -framerate 10 -i {Path(FLAGS.OutDir)}/{FLAGS.Method}/{index+1:05}-%2ds-{styleID}.png -s 512x512 \
-        # -vcodec libx264 -crf 25 -pix_fmt yuv420p {Path(FLAGS.OutDir)}/{FLAGS.Method}/video/{index+1:05}-{styleID}.mp4")
+        os.system(f"ffmpeg -y -f image2 -framerate 10 -i {Path(FLAGS.OutDir)}/{prefix}-%2ds-st.png -s 512x512 \
+        -vcodec libx264 -crf 25 -pix_fmt yuv420p {Path(FLAGS.OutDir)}/video/{prefix}-st.mp4")
 
 
