@@ -32,7 +32,7 @@ conda install pytorch3d -c pytorch3d
 4. Clone and setup the project.
 Clone the project with all third-party submodules. Run `setup.sh` to download models for view synthesis and style transfer.
 ```
-git clone --recurse-submodules
+git clone --recurse-submodules https://github.com/Kuan-Wei-Tseng/ArtNV.git
 cd ArtNV
 sh setup.sh
 ```
