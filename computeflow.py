@@ -72,7 +72,6 @@ def get_grid(tensor, homogeneous=False):
 def demo(args):
     model = torch.nn.DataParallel(RAFT(args))
     model.load_state_dict(torch.load(args.model))
-
     model = model.module
     model.to(device)
     model.eval()
@@ -83,13 +82,11 @@ def demo(args):
         n = len(anchor_path)
 
         for index in range(n):
-
             prefix = anchor_path[index].stem.split('-')[0]
             source_img = load_image(anchor_path[index])
-            
-            for j in tqdm(range(args.Views)):
 
-                target_img = load_image(Path(args.ContentDir)/f"{prefix}-{j:02}s.png")
+            for j in tqdm(range(args.Views)):
+                target_img = load_image(Path(args.ContentDir)/f"{prefix}-{j:02}.png")
                 _, flows_t = model(target_img, source_img, iters=20, test_mode=True)
                 _, flowt_s = model(source_img, target_img, iters=20, test_mode=True)
 
@@ -103,7 +100,6 @@ def demo(args):
                 torch.save(masks_t, Path(args.MaskDir)/f"masks_t{prefix}-{j:02}.pt")
                 torch.save(maskt_s, Path(args.MaskDir)/f"maskt_s{prefix}-{j:02}.pt")     
 
-                    
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', default="RAFT/models/raft-things.pth", help="restore checkpoint")
@@ -111,8 +107,8 @@ if __name__ == '__main__':
     parser.add_argument('--small', action='store_true', help='use small model')
     parser.add_argument('--mixed_precision', action='store_true', help='use mixed precision')
     parser.add_argument('--alternate_corr', action='store_true', help='use efficent correlation implementation')
-    parser.add_argument('--Views', type=int, default=12, help='Number of Novel Views')
-    parser.add_argument('--ContentDir', type=str, default="../images/content", help='Path to the content images')
+    parser.add_argument('--Views', type=int, default=14, help='Number of Novel Views')
+    parser.add_argument('--ContentDir', type=str, default="../images/content/synthesized", help='Path to the content images')
     parser.add_argument('--FlowDir', type=str, default="../images/flow", help='Path to save the optical flows')
     parser.add_argument('--MaskDir', type=str, default="../images/mask", help='Path to save the optical flows')
     args = parser.parse_args()

@@ -32,7 +32,7 @@ parser.add_argument('--num_steps', type=int, default=300,
 
 parser.add_argument('--StylePath', type=str, default="../images/style/0.jpg", 
                      help='Path to the style image')        
-parser.add_argument('--ContentDir', type=str, default="../images/content", 
+parser.add_argument('--ContentDir', type=str, default="../images/content/synthesized", 
                      help='Path to the content images')
 
 parser.add_argument('--flow', action="store_true")
@@ -42,6 +42,7 @@ parser.add_argument('--MaskDir', type=str, default="../images/mask/",
                      help='Path to the optical flow')          
 parser.add_argument('--OutDir', type=str, default="../images/result/", 
                      help='Path to the save the results')
+parser.add_argument('--Views', type=int, default=14, help='Number of Novel Views')
 
 parser.add_argument('--style_weight'  , type=int, default=1000000)
 parser.add_argument('--content_weight', type=int, default=1)
@@ -62,8 +63,8 @@ if __name__ == '__main__':
         source_img = image_loader(anchor_path[index])
         input_img = [source_img]
 
-        for j in range(12):
-            target_img = image_loader(Path(FLAGS.ContentDir)/f"{prefix}-{j:02}s.png")
+        for j in range(FLAGS.Views):
+            target_img = image_loader(Path(FLAGS.ContentDir)/f"{prefix}-{j:02}.png")
             input_img.append(target_img)
 
         input_img = torch.cat(input_img)
