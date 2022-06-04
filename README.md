@@ -1,5 +1,8 @@
 # ArtNV
-This is the official implementation of "Artistic Style Novel View Synthesis Based on A Single Image" (CVPR 2022 Workshop). The code will be available in **mid June**, 2022.
+This is the official implementation of "Artistic Style Novel View Synthesis Based on A Single Image" (CVPR 2022 Workshop). 
+
+Note: :warning:
+This project is still under construction. The code will be ready in **mid June**, 2022.
 
 ## Installation
 Our codes are tested on the following environment:

@@ -26,7 +26,7 @@ parser = argparse.ArgumentParser(description='PyTorch Artistic View Synthesis')
 # Training parameters
 parser.add_argument('--MODEL_PATH', type=str, default='synsin/modelcheckpoints/realestate/zbufferpts.pth', 
                      help='View synthesis pretrained model path')
-parser.add_argument('--RawDir', type=str, default="../images/content/", 
+parser.add_argument('--RawDir', type=str, default="../images/content/raw", 
                      help='Path to raw inputs')
 parser.add_argument('--OutDir', type=str, default="../images/content/", 
                      help='Path to the save the results')
@@ -68,7 +68,7 @@ transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-ims = Path(FLAGS.RawDir).glob('raw/*')
+ims = sorted(Path(FLAGS.RawDir).glob('*'))
 
 for index, im_path in enumerate(ims):
 
